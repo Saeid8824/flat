@@ -175,3 +175,5 @@ cython_debug/
 /debug-environments
 /debug-environments.zip
 
+/reinforcement_learning/curriculum/curriculum/
+/outputs/

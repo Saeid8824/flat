@@ -1,15 +1,18 @@
 # Starterkit for ECML 2026: Real-World Baselines Challenge
 
-This repo is a starterkit for participating in the Real-World Baselines Challenge for the [2026 ECML](https://ecmlpkdd.org/2026/) conference: [competition.flatland.cloud](https://competition.flatland.cloud).
+This repo is a starterkit for participating in the Real-World Baselines Challenge for the [2026 ECML](https://ecmlpkdd.org/2026/)
+conference: [competition.flatland.cloud](https://competition.flatland.cloud).
 
-The competition documentation is included in [Flatland Book](https://flatland-association.github.io/flatland-book/challenges/ecml2026.html) (see also the [topology description](COMPETITION-TOPOLOGY-DESCRIPTION.md)).
-
+The competition documentation is included in [Flatland Book](https://flatland-association.github.io/flatland-book/challenges/ecml2026.html) (see also
+the [topology description](COMPETITION-TOPOLOGY-DESCRIPTION.md)).
 
 ## TL;DR; aka. First Submission
 
-1. Fork (or clone to keep your solution private until the end of the competition) this repo and code. See [existing forks](https://github.com/flatland-association/ecml2026-starterkit/forks) for illustration.
+1. Fork (or clone to keep your solution private until the end of the competition) this repo and code.
+   See [existing forks](https://github.com/flatland-association/ecml2026-starterkit/forks) for illustration.
 2. Manually trigger gh action `docker`  under `https://github.com/<user/orga>/<forked repo name>/actions/`
-3. Copy the docker image URL from `https://github.com/<user/orga>/<forked repo name>/pkgs/container/<forked repo name>` and give the *Flatland Competition* account access to the package in the repo's *Package settings* for private repos.
+3. Copy the docker image URL from `https://github.com/<user/orga>/<forked repo name>/pkgs/container/<forked repo name>` and give the *Flatland Competition*
+   account access to the package in the repo's *Package settings* for private repos.
 4. Go to https://competition.flatland.cloud and enter the docker image URL when creating a submission.
 
 ![Workflow.drawio.png](docs/Workflow.drawio.png)
@@ -25,9 +28,12 @@ See [STEP-BY-STEP_GUIDE](STEP-BY-STEP_GUIDE.md) contributed by <a href="https://
 
 ### Train your model using reinforcement learning
 
-If you use reinforcement learning to train your policy, update the files in the submission folder to load your model either by setting *MyPolicy* using *policy_from_checkpoint.py* or a custom implementation.
+If you use reinforcement learning to train your policy, update the files in the submission folder to load your model either by setting *MyPolicy* using
+*policy_from_checkpoint.py* or a custom implementation.
 
-There is an example for a trained checkpoint with a custom observation and policy. To use the pretrained checkpoint, add the following files from the */reinforcement-learning* folder to the */submission* folder:
+There is an example for a trained checkpoint with a custom observation and policy. To use the pretrained checkpoint, add the following files from the
+*/reinforcement-learning* folder to the */submission* folder:
+
 * my_observation_builder.py
 * my_policy.py
 * checkpoint.pt
@@ -37,7 +43,7 @@ There is an example for a trained checkpoint with a custom observation and polic
 
 See [checks.yaml](.github/workflows/checks.yaml) for full details.
 
-### Single episode:
+### Single episode
 
 ```bash
 docker build  -t submission/mysolution -f Dockerfile .
@@ -55,43 +61,64 @@ Generating Normal Video...
 Videos :  /tmp/outputs/out.mp4 /tmp/outputs/out_thumb.mp4
 ```
 
-### Test set from metadata:
+### Curriculum evaluation
 
 ```bash
-wget "https://data.flatland.cloud/benchmarks/Flatland3/debug-environments.zip" -O debug-environments.zip
-mkdir -p scenarios
-unzip debug-environments.zip -d scenarios
-docker run -v ./scenarios/debug-environments/:/inputs submission/mysolution flatland-trajectory-generate-from-metadata --metadata-csv /inputs/metadata.csv --data-dir /tmp
+# empty and re-create local folder
+rm -fR outputs
+mkdir -p outputs
+
+unzip -o reinforcement_learning/curriculum/example_curriculum.zip -d reinforcement_learning/curriculum/curriculum
+
+# run docker with volume mapping
+ENVS=(
+   '00_scene_1_ll-2_a-1'
+   '01_scene_4_ll-2_a-1'
+   '02_scene_5_ll-2_a-1'
+   '03_scene_1_ll-2_a-10'
+   '04_scene_4_ll-2_a-10'
+   '05_scene_5_ll-2_a-10'
+   '06_scene_1_ll-2_a-25'
+   '07_scene_4_ll-2_a-25'
+   '08_scene_5_ll-2_a-25'
+   '09_scene_1_ll-3_a-1'
+   '10_scene_4_ll-3_a-1'
+   '11_scene_5_ll-3_a-1'
+   '12_scene_1_ll-3_a-10'
+   '13_scene_4_ll-3_a-10'
+   '14_scene_5_ll-3_a-10'
+   '15_scene_1_ll-3_a-25'
+   '16_scene_4_ll-3_a-25'
+   '17_scene_5_ll-3_a-25'
+   '18_scene_1_ll-4_a-1'
+   '19_scene_4_ll-4_a-1'
+   '20_scene_5_ll-4_a-1'
+   '21_scene_1_ll-4_a-10'
+   '22_scene_4_ll-4_a-10'
+   '23_scene_5_ll-4_a-10'
+   '24_scene_1_ll-4_a-25'
+   '25_scene_4_ll-4_a-25'
+   '26_scene_5_ll-4_a-25'
+)
+
+for env in "${ENVS[@]}"; do
+  echo "env: $env"
+  mkdir -p ./outputs/${env}
+  docker run -v ./reinforcement_learning/curriculum/curriculum:/inputs -v ./outputs:/tmp submission/mysolution flatland-trajectory-generate-from-policy --data-dir /tmp/${env} --rewards flatland.envs.rewards.ECML2026Rewards --env-path /inputs/${env}.pkl --ep-id ${env}
+done
 ```
 
-Output:
-
-```log
-+ PYTHONPATH=/home/conda
-+ flatland-trajectory-generate-from-metadata --metadata-csv /inputs/metadata.csv --data-dir /tmp
-100%|█████████▉| 199/200 [00:00<00:00, 4773.78it/s]
-```
-
-### Use Volumes and Get Report
+### Get report
 
 ```shell
 # empty and re-create local folder
-rm -fR outputs
 rm -fR analysis
-mkdir -p outputs
 mkdir -p analysis
 
 # run docker with volume mapping
-docker run -v ./scenarios/debug-environments/:/inputs -v ./outputs:/outputs submission/mysolution flatland-trajectory-generate-from-metadata --metadata-csv /inputs/metadata.csv --data-dir /outputs
 docker run -v ./outputs:/outputs -v ./analysis:/analysis submission/mysolution flatland-trajectory-analysis --root-data-dir /outputs --output-dir /analysis
 # ls -al analysis
 cat analysis/all_trains_arrived.csv
-#episode_id,env_time,success_rate,normalized_reward
-#Test_0_Level_0,197,0.0,0.608080808080808
-#Test_0_Level_1,144,0.6,0.6648275862068965
-#Test_1_Level_0,510,0.0,0.449119373776908
-#Test_1_Level_1,244,0.0,0.0489795918367347
-#Test_1_Level_2,187,0.0,0.151595744680851
 ```
 
 ### Further CLI options
