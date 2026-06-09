@@ -154,7 +154,7 @@ def sampling_env_generator(env: RailEnv, line_length: int = 2, scene: str = None
 
     _previous_rail_generator = env.rail_generator
  
-    with files('ecml2026-starterkit.reinforcement-learning').joinpath('stations.pkl').open('rb') as f:
+    with files('reinforcement_learning.sampling').joinpath('stations.pkl').open('rb') as f:
         data = pickle.load(f)
 
     assert scene is None or scene in {"scene_1", "scene_2", "scene_3", "scene_4", "scene_5"}, "Scene should be 'scene_1', 'scene_2', 'scene_3', 'scene_4', 'scene_5' or None (equivalent to 'scene_5', i.e. all stations)"

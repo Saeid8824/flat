@@ -1,5 +1,7 @@
 # Example Curriculum
 
+
+
 This example curriculum contains 27 environments with the ECML2026 competiton setup.
 
 They all have the following malfunction parametrization, including both breakdowns and departure delays.
@@ -16,6 +18,8 @@ They all have the following malfunction parametrization, including both breakdow
     "malfunction_interval": 10
 },
 ```
+
+Malfunctions and default number of agents (6) is given by the input file *sampling/level_0_scenario_1.pkl*. To create your own input file from a metadata JSON, see [flatland-scenarios](https://github.com/flatland-association/flatland-scenarios/tree/main/competitions/competition_2026).
 
 The example contains the following configurations
 
@@ -48,3 +52,11 @@ The example contains the following configurations
 | 24_scene_1_ll-4_a-25.pkl |   1   |           4         |        25        |
 | 25_scene_4_ll-4_a-25.pkl |   4   |           4         |        25        |
 | 26_scene_5_ll-4_a-25.pkl |   5   |           4         |        25        |
+
+
+## Run ```create_curriculum_envs```
+
+Run from top level (ecml2026-starterkit)
+```
+python -m reinforcement_learning.create_curriculum_envs
+```
