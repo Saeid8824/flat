@@ -168,7 +168,7 @@ docker run submission/mysolution flatland-trajectory-generate-from-metadata --he
 
 If you want to run the above commands in a local environment directly (independent of Docker container),
 use [environment.yml from flatland-baselines](https://github.com/flatland-association/flatland-baselines/blob/main/environment.yml)
-see [instructions](https://github.com/flatland-association/flatland-baselines/tree/main?tab=readme-ov-file#tldr).
+(see [instructions](https://github.com/flatland-association/flatland-baselines/tree/main?tab=readme-ov-file#tldr)).
 
 ## Further Information
 
