@@ -1,5 +1,8 @@
 # Starterkit for ECML 2026: Real-World Baselines Challenge
 
+<img width="1842" height="1521" alt="image" src="https://github.com/user-attachments/assets/2fdbc48c-1820-43a5-9483-51e2448418fb" />
+
+
 This repo is a starterkit for participating in the Real-World Baselines Challenge for the [2026 ECML](https://ecmlpkdd.org/2026/)
 conference: [competition.flatland.cloud](https://competition.flatland.cloud).
 
